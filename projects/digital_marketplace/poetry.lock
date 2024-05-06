@@ -111,31 +111,46 @@ frozenlist = ">=1.1.0"
 
 [[package]]
 name = "algokit-client-generator"
-version = "1.1.3"
+version = "1.1.4b2"
 description = "Algorand typed client Generator"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "algokit_client_generator-1.1.3-py3-none-any.whl", hash = "sha256:8b6dffe8ce6ae0708a7842248a4fddb61e55e56889d1ab67bbc0f2028a051d7a"},
+    {file = "algokit_client_generator-1.1.4b2-py3-none-any.whl", hash = "sha256:e8227f0eceec92b2d7f02cb97128b56257511e3bd6ba7186b763cc5718279f7f"},
 ]
 
 [package.dependencies]
-algokit-utils = "2.2.1"
+algokit-utils = "2.2.2"
 
 [[package]]
 name = "algokit-utils"
-version = "2.2.1"
+version = "2.2.2"
 description = "Utilities for Algorand development for use by AlgoKit"
 optional = false
-python-versions = ">=3.10,<4.0"
-files = [
-    {file = "algokit_utils-2.2.1-py3-none-any.whl", hash = "sha256:5d669211500e3ae9d29a93ec9b2cc174a3b4aca48b345f475ee8ba955df5f555"},
-]
+python-versions = "^3.10"
+files = []
+develop = false
 
 [package.dependencies]
-deprecated = ">=1.2.14,<2.0.0"
-httpx = ">=0.23.1,<0.24.0"
-py-algorand-sdk = ">=2.4.0,<3.0.0"
+deprecated = "^1.2.14"
+httpx = "^0.23.1"
+py-algorand-sdk = "^2.4.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/algorandfoundation/algokit-utils-py"
+reference = "HEAD"
+resolved_reference = "5ee3a3b370d155f3a3729444a6d5a5cc4a7f46f6"
+
+[[package]]
+name = "algopy"
+version = "0.5.7"
+description = "ALGOPY: Taylor Arithmetic Computation and Algorithmic Differentiation"
+optional = false
+python-versions = "*"
+files = [
+    {file = "algopy-0.5.7.zip", hash = "sha256:6955f676fce3858fa3585cb7f3f7e1796cb93377d24016419b6699291584b7df"},
+]
 
 [[package]]
 name = "algorand-python"
@@ -1958,4 +1973,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "786a684ce63d7b8021fc7de3d9f98c3a5254195e8126868a34870231db81b27e"
+content-hash = "5ab87b018aefa124853e7c56639ea8d483fa4f65ef117170eabc6264106f57a9"

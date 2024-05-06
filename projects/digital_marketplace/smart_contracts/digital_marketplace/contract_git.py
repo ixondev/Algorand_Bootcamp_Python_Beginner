@@ -1,21 +1,30 @@
-# from algopy import *
-from algopy import ARC4Contract, Asset, Global, Txn, UInt64, arc4, gtxn, itxn
+# pyright: reportMissingModuleSource=false
+from algopy import (
+    Asset,
+    Global,
+    Txn,
+    UInt64,
+    arc4,
+    gtxn,
+    itxn,
+)
 
 
-class DigitalMarketplace(ARC4Contract):
-
-    asset_id : UInt64
+class DigitalMarketplace(arc4.ARC4Contract):
+    asset_id: UInt64
     unitary_price: UInt64
-    
-    # Create the app
-    @arc4.abimethod(allow_actions=["NoOp"], create="require")
-    def create_application(self, asset_id: Asset, unitary_price:UInt64) -> None:
 
+    @arc4.abimethod(allow_actions=["NoOp"], create="require")
+    def create_application(self, asset_id: Asset, unitary_price: UInt64) -> None:
         self.asset_id = asset_id.id
         self.unitary_price = unitary_price
 
-        
-    # opt in [00:43:13]
+    @arc4.abimethod
+    def set_price(self, unitary_price: UInt64) -> None:
+        assert Txn.sender == Global.creator_address
+
+        self.unitary_price = unitary_price
+
     @arc4.abimethod
     def opt_in_to_asset(self, mbr_pay: gtxn.PaymentTransaction) -> None:
         assert Txn.sender == Global.creator_address
@@ -30,37 +39,25 @@ class DigitalMarketplace(ARC4Contract):
             asset_amount=0,
         ).submit()
 
-
-    # update the listing price
-    @arc4.abimethod
-    def set_price(self, unitary_price:UInt64) -> None:
-        assert Txn.sender == Global.creator_address
-        self.unitary_price = unitary_price
-
-
-    # buy the asset [00:53:00]
     @arc4.abimethod
     def buy(
-        self, 
-        buyer_txn: gtxn.PaymentTransaction, 
-        quantity: UInt64
-        ) -> None:
+        self,
+        buyer_txn: gtxn.PaymentTransaction,
+        quantity: UInt64,
+    ) -> None:
         assert self.unitary_price != UInt64(0)
 
-        # decoded_quantity = quantity
+        decoded_quantity = quantity
         assert buyer_txn.sender == Txn.sender
         assert buyer_txn.receiver == Global.current_application_address
-        # assert buyer_txn.amount == self.unitary_price * decoded_quantity
-        assert buyer_txn.amount == self.unitary_price * quantity
+        assert buyer_txn.amount == self.unitary_price * decoded_quantity
 
         itxn.AssetTransfer(
             xfer_asset=self.asset_id,
             asset_receiver=Txn.sender,
-            # asset_amount=decoded_quantity,
-            asset_amount=quantity
+            asset_amount=decoded_quantity,
         ).submit()
 
-    # delete the application [00:58:55]
     @arc4.abimethod(allow_actions=["DeleteApplication"])
     def delete_application(self) -> None:
         assert Txn.sender == Global.creator_address
@@ -70,12 +67,10 @@ class DigitalMarketplace(ARC4Contract):
             asset_receiver=Global.creator_address,
             asset_amount=0,
             asset_close_to=Global.creator_address,
-            # fee=0,                                      # <-- Agregada en Sesión 2
         ).submit()
 
         itxn.Payment(
             receiver=Global.creator_address,
             amount=0,
             close_remainder_to=Global.creator_address,
-            # fee=0,                                      # <-- Agregada en Sesión 2
         ).submit()

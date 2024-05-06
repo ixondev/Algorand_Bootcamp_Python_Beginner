@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@algorandfoundation/algokit-utils": "^6.0.0-beta.4"
+  }
+}

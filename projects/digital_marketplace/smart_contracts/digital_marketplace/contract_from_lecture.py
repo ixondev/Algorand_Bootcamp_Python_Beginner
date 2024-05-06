@@ -1,5 +1,4 @@
-# from algopy import *
-from algopy import ARC4Contract, Asset, Global, Txn, UInt64, arc4, gtxn, itxn
+from algopy import *
 
 
 class DigitalMarketplace(ARC4Contract):
@@ -14,28 +13,25 @@ class DigitalMarketplace(ARC4Contract):
         self.asset_id = asset_id.id
         self.unitary_price = unitary_price
 
+    # update the listing price
+    @arc4.abimethod
+    def set_price(self, unitary_price:UInt64) -> None:
+        assert Txn.sender == Global.creator_address
+        self.unitary_price = unitary_price
+
         
     # opt in [00:43:13]
     @arc4.abimethod
     def opt_in_to_asset(self, mbr_pay: gtxn.PaymentTransaction) -> None:
         assert Txn.sender == Global.creator_address
         assert not Global.current_application_address.is_opted_in(Asset(self.asset_id))
-
         assert mbr_pay.receiver == Global.current_application_address
         assert mbr_pay.amount == Global.min_balance + Global.asset_opt_in_min_balance
-
         itxn.AssetTransfer(
             xfer_asset=self.asset_id,
             asset_receiver=Global.current_application_address,
             asset_amount=0,
         ).submit()
-
-
-    # update the listing price
-    @arc4.abimethod
-    def set_price(self, unitary_price:UInt64) -> None:
-        assert Txn.sender == Global.creator_address
-        self.unitary_price = unitary_price
 
 
     # buy the asset [00:53:00]
@@ -47,17 +43,15 @@ class DigitalMarketplace(ARC4Contract):
         ) -> None:
         assert self.unitary_price != UInt64(0)
 
-        # decoded_quantity = quantity
+        decoded_quantity = quantity
         assert buyer_txn.sender == Txn.sender
         assert buyer_txn.receiver == Global.current_application_address
-        # assert buyer_txn.amount == self.unitary_price * decoded_quantity
-        assert buyer_txn.amount == self.unitary_price * quantity
+        assert buyer_txn.amount == self.unitary_price * decoded_quantity
 
         itxn.AssetTransfer(
             xfer_asset=self.asset_id,
             asset_receiver=Txn.sender,
-            # asset_amount=decoded_quantity,
-            asset_amount=quantity
+            asset_amount=decoded_quantity,
         ).submit()
 
     # delete the application [00:58:55]
@@ -70,12 +64,12 @@ class DigitalMarketplace(ARC4Contract):
             asset_receiver=Global.creator_address,
             asset_amount=0,
             asset_close_to=Global.creator_address,
-            # fee=0,                                      # <-- Agregada en Sesión 2
+            fee=0,                                      # <-- Agregada en Sesión 2
         ).submit()
 
         itxn.Payment(
             receiver=Global.creator_address,
             amount=0,
             close_remainder_to=Global.creator_address,
-            # fee=0,                                      # <-- Agregada en Sesión 2
+            fee=0,                                      # <-- Agregada en Sesión 2
         ).submit()

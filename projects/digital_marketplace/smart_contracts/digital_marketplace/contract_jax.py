@@ -1,5 +1,4 @@
-# from algopy import *
-from algopy import ARC4Contract, Asset, Global, Txn, UInt64, arc4, gtxn, itxn
+from algopy import *
 
 
 class DigitalMarketplace(ARC4Contract):
@@ -20,7 +19,7 @@ class DigitalMarketplace(ARC4Contract):
     def opt_in_to_asset(self, mbr_pay: gtxn.PaymentTransaction) -> None:
         assert Txn.sender == Global.creator_address
         assert not Global.current_application_address.is_opted_in(Asset(self.asset_id))
-
+        
         assert mbr_pay.receiver == Global.current_application_address
         assert mbr_pay.amount == Global.min_balance + Global.asset_opt_in_min_balance
 
